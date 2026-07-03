@@ -1,0 +1,906 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREÂMBULO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt,openright,oneside,a4paper]{abntex2}
+\pagestyle{plain}
+
+
+% Codificação e idioma
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% Fonte, espaçamento e microtipografia
+\usepackage{lmodern}
+\usepackage{setspace}
+%\setstretch{1.2}
+\usepackage{microtype}
+\usepackage{indentfirst}  % Indenta o primeiro parágrafo
+
+% Matemática
+\usepackage{amsmath, amssymb, amsthm}
+
+% Gráficos e posicionamento
+\usepackage{graphicx}
+\usepackage{float}
+
+% Listas e cores
+\usepackage{enumerate}
+\usepackage{xcolor}
+\usepackage{color}
+
+% Hiperlinks e metadados do PDF
+\usepackage{hyperref}
+\hypersetup{
+    pdftitle={Introdução a Equações Diferenciais Estocásticas e Precificação de Derivativos Através de Simulação},
+    pdfauthor={Guilherme Valverde Freiria, Luiz Koodi Hotta},
+    pdfsubject={Iniciação Científica - ABNT/LaTeX},
+    pdfkeywords={Equações diferenciais estocásticas, Cálculo estocástico, Processos estocásticos, Finanças, Simulação},
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=black
+}
+
+% Margens
+\usepackage{geometry}
+\geometry{a4paper,left=3cm,right=2cm,top=3cm,bottom=2cm}
+
+% Citações e referências bibliográficas
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{ref.bib}
+\usepackage{csquotes}
+\usepackage[num]{abntex2cite}
+
+% Estilo de seções
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\bfseries\normalsize}{\thesubsection}{1em}{}
+
+% Numeração de equações por seção
+\numberwithin{equation}{section}
+
+
+% No preâmbulo
+%\setcounter{secnumdepth}{1} % só enumera \section
+\setcounter{tocdepth}{2}    % mostra até \subsection no sumário
+\renewcommand{\thesection}{\arabic{section}}
+
+\usepackage{amsmath} % Pacote recomendado para matemática
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INÍCIO DO DOCUMENTO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\pagenumbering{arabic}
+% Capa personalizada
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=4cm]{imagens/unicamp.png}\\[1em]
+        {\large \sc UNIVERSIDADE ESTADUAL DE CAMPINAS} \\
+        {\large \sc INSTITUTO DE MATEMÁTICA, ESTATÍSTICA E COMPUTAÇÃO CIENTÍFICA}\\[0.7cm]
+        
+        \vspace{4cm}
+
+        % Título
+        {\large \sc Relatório Final PIBIC}\\
+        \rule{\linewidth}{2pt}
+        
+        \vspace{0.7em}
+        {\Large \bfseries Introdução a Equações Diferenciais Estocásticas \\ e Precificação de Derivativos Através de Simulação}
+        \vspace{0.2em}
+        
+        \rule{\linewidth}{2pt} \\
+        \vspace{1cm}
+        { \large \sc Período: 01/09/2024 - 31/07/2025 }
+    \end{center}
+    
+    \vspace{2.8cm}
+
+    % Assinaturas
+    \begin{minipage}{0.43\textwidth}
+        \emph{Bolsista:}\\[1.58cm]
+        \rule{0.9\linewidth}{0.3mm}\\
+        Guilherme Valverde Freiria
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.43\textwidth}
+        \emph{Orientador:}\\[1.58cm]
+        \rule{0.9\linewidth}{0.3mm}\\
+        Luiz Koodi Hotta
+    \end{minipage}
+
+    \vfill
+
+    % Local e data
+    \begin{center}
+        Campinas, SP \\
+        2025
+    \end{center}
+\end{titlepage}
+
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CAPÍTULO 1 - PROCESSOS ESTOCÁSTICOS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introdução}
+
+A precificação de derivativos/instrumentos financeiros é um dos principais desafios da área de finanças quantitativas, especialmente diante do aumento da complexidade dos instrumentos disponíveis no mercado. Muitos desses instrumentos, como opções e outros tipos de derivativos, não possuem soluções analíticas diretas, o que torna indispensável o uso de métodos numéricos para estimar seus valores com precisão.
+
+Neste projeto, foi investigado o uso de simulações numéricas aplicadas à precificação de opções, com ênfase na modelagem estocástica do comportamento dos ativos subjacentes. A evolução dos preços foi modelada por equações diferenciais estocásticas (EDEs), que permitem incorporar incertezas e flutuações observadas no mercado. A abordagem adotada inclui o estudo teórico de processos estocásticos, com destaque para o movimento browniano, e a aplicação prática desses modelos por meio de algoritmos de simulação como o método de Monte Carlo.
+
+Ao longo do trabalho, foram exploradas ferramentas matemáticas fundamentais para a construção desses modelos, além de técnicas computacionais voltadas à geração de trajetórias e à análise estatística dos resultados. A proposta do projeto é fornecer uma introdução sólida aos conceitos centrais do cálculo estocástico e suas aplicações no contexto financeiro.
+\section{Definições}
+
+\subsection{Processos Estocásticos}
+
+
+Um processo estocástico $X$ é uma família de variáveis aleatórias definidas em um espaço de probabilidade e indexadas por algum conjunto T. Formalmente, seja
+$$
+(X_t, t \in T) = (X_t(\omega), t \in T, \omega \in \Omega),
+$$
+onde $t$ é um parâmetro que assume valores em um conjunto $T \subset \mathbb{R}$, denominado conjunto de índices do processo, e $\omega$ é o espaço amostral \parencite[p.~23]{Mikosh}.
+\\
+
+
+
+\textbf{Observações:}
+\begin{itemize}
+    \item Matematicamente, $T$ pode ser de qualquer natureza, porém em muitas aplicações representa o tempo.
+    \item Quando $T$ é um conjunto finito ou infinito numerável, $X$ é classificado como um processo estocástico de tempo discreto. Se $T$ não for numerável, o processo é considerado de tempo contínuo. Se $T$ é finito, o processo é meramente um vetor aleatório, enquanto se for infinito numerável, consiste em uma sequência de variáveis aleatórias.
+    \item O espaço de estados de $X$ consiste nos possíveis valores que as variáveis aleatórias $X_t$ podem tomar. Se este espaço é numerável, o processo é chamado de processo com espaço de estados discreto.
+    \item Cada realização do processo estocástico $X$, também chamada de trajetória, é uma função do tempo \( t \in T \), associando um valor específico \( x_t \) a cada instante \( t \).
+
+    \item O processo estocástico $X$ funciona como uma função de duas variáveis:
+    \begin{itemize}
+        \item Como variável aleatória para cada ponto fixo de tempo $t$  \parencite[p.~23]{Mikosh}:
+        
+        
+        $$X_t = X_t(\omega), \quad \omega \in \Omega.$$
+        \item Como uma curva ou função do tempo ao longo de uma trajetória fixa, onde cada $t$ é mapeado para um valor específico $x_t$.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Movimento browniano}
+
+Um processo estocástico $B = (B_t, t \in [0, \infty))$ diz-se um movimento browniano, ou processo de Wiener, quando \parencite [p.~33] {Mikosh}: 
+\begin{itemize}
+    \item Se inicia com $B_0 = 0$.
+    \item Tem incrementos estacionários e independentes.
+    \item $B_t \sim N(0, t), \forall t > 0$.
+    \item As trajetórias são funções contínuas de $t$.
+\end{itemize}
+\textbf{Propriedade Importante:}
+
+As variáveis aleatórias $B_t - B_s$ e $B_{t-s}$ têm uma distribuição $N(0, t - s)$ para $s < t$.  
+Portanto a variância é proporcional ao tamanho do intervalo $[s,t]$ \parencite [p. ~35] {Mikosh}. 
+
+As trajetórias são funções contínuas, mas não são diferenciáveis e sua variação é ilimitada \parencite [Apêndice A3, p. 188]{Mikosh}.
+
+\subsection{$\sigma$-álgebra}
+
+Seja $\Omega$ um conjunto não vazio. Uma $\sigma$-álgebra $\mathcal{F}$ (em $\Omega$) é uma coleção de subconjuntos de $\Omega$ que satisfaz as seguintes condições \parencite [p.~62] {Mikosh}:
+
+\begin{itemize}
+    \item $\Omega \in \mathcal{F}$.
+    \item Se $A \in \mathcal{F}$, então $A^c \in \mathcal{F}$.
+    \item Se $A_1, A_2, \dots \in \mathcal{F}$, então
+    \[\bigcup_{i=1}^{\infty} A_i \in \mathcal{F}. \quad\]
+\end{itemize}
+
+\subsection{Filtração}
+
+A coleção \(\left(\mathcal{F}_t,\, t \geq 0\right)\) de \(\sigma\)-álgebras em \(\Omega\) é chamada de filtração se, para todo \(s \geq t \geq 0\), temos
+\[
+\mathcal{F}_t \subseteq \mathcal{F}_s.
+\]
+Portanto, uma filtração é um fluxo crescente de informações.
+
+Se \(\left(\mathcal{F}_n,\, n = 0, 1, \ldots \right)\) é uma sequência de \(\sigma\)-álgebras em \(\Omega\) tal que \(\mathcal{F}_n \subseteq \mathcal{F}_{n+1}\) para todo \(n\), também chamamos \(\left(\mathcal{F}_n\right)\) de filtração, conforme \textcite[p.~77]{Mikosh}.
+
+\subsection{Processo Estocástico Adaptado a uma Filtração}
+
+Diz-se que um processo estocástico \(X = (X_t,\, t \geq 0)\) está adaptado à filtração \((\mathcal{F}_t,\, t \geq 0)\) quando, de acordo com \textcite[p.~77]{Mikosh},
+\[
+\sigma(X_t) \subset \mathcal{F}_t, \quad t \geq 0.
+\]
+Aqui, \(\sigma(X_t)\) denota a \(\sigma\)-álgebra gerada pela variável aleatória \(X_t\), isto é, o conjunto de eventos que podem ser ``observados'' a partir de \(X_t\).
+
+
+\subsection{Martingal em Tempo Contínuo}
+
+Um processo estocástico $X = (X_t, t \geq 0)$ diz-se um martingal em tempo contínuo relativamente à filtração $\{\mathcal{F}_t, t \geq 0\}$, e escreve-se $(X, (\mathcal{F}_t))$, quando \parencite [p.~80] {Mikosh}:
+\begin{itemize}
+    \item $\mathbb{E}[|X_t|] < \infty, \quad t \geq 0$
+    \item $X$ está adaptado a $(\mathcal{F}_t).$
+    \item $\mathbb{E}[X_t \mid \mathcal{F}_s] = X_s$, para $0 \leq s < t$, isto é, dada $\mathcal{F}_s$, $X_s$ é a melhor previsão para $X_t$.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CAPÍTULO 2 - CÁLCULO ESTOCÁSTICO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cálculo Estocástico}
+
+\subsection{Integral Estocástica de Itô }
+
+A integral estocástica é uma ferramenta fundamental na teoria de processos estocásticos e no cálculo estocástico. Ela permite integrar funções em relação a processos estocásticos, como o movimento browniano, que possuem comportamento altamente irregular. A integral estocástica é amplamente utilizada em diversas áreas, especialmente na matemática financeira, para modelar a evolução de preços de ativos financeiros.
+
+Seja $B_t$ um processo estocástico, conhecido como movimento browniano, e uma função $f(t, B_t)$ adaptada ao movimento browniano, ou seja, uma função cujo valor em cada instante $t$ depende apenas dos valores de $B_s$ para $s \leq t$. A integral estocástica de $f$ em relação ao movimento browniano $B_t$ no intervalo $[0, T]$ é denotada por:
+\begin{equation}
+\int_0^T f(t, B_t) \, dB_t.
+\end{equation}
+
+Diferente da integral de Riemann-Stieltjes, que requer variação limitada para a função de integração, a integral estocástica lida com o movimento browniano, que tem variação ilimitada. Para construir essa integral de Itô, usa-se uma soma do tipo "left-point" (ponto inicial) em cada subintervalo, o que resulta em propriedades específicas para a integral estocástica. Considere o intervalo $[0,T]$. A integral estocástica de Itô de $f(t, B_t)$ em relação a $B_t$ é definida como o limite de uma soma de Itô:
+\begin{equation}
+\int_0^T f(t, B_t) \, dB_t  
+\;=\; 
+\lim_{n \to \infty}  
+\sum_{i=0}^{n-1}  
+f(t_i, B_{t_i}) \,\bigl(B_{t_{i+1}} - B_{t_i}\bigr),
+\end{equation}
+em que $0 = t_0 < t_1 < \dots < t_n = T$ são pontos que subdividem $[0,T]$ de forma cada vez mais refinada, e $f(t_i, B_{t_i})$ é avaliado no ponto inicial de cada subintervalo.
+
+\medskip
+
+A escolha do ponto inicial é essencial para caracterizar a integral de Itô, pois assegura propriedades importantes, como a preservação da martingalidade do processo resultante \parencite [p.~103] {Mikosh}.
+
+\subsection{Fórmula de Itô}
+
+A fórmula de Itô é uma generalização da regra da cadeia para o cálculo diferencial estocástico. Ela descreve como a função de um processo estocástico, como o movimento browniano, evolui ao longo do tempo. A fórmula de Itô é especialmente útil para calcular integrais estocásticas de Itô.
+
+Seja $f$ uma função duas vezes continuamente diferenciável. A forma simples do Lema de Itô (Fórmula de Itô) é:
+
+\begin{equation}
+f(B_t) - f(B_s) = \int_s^t f'(B_x) \, dB_x + \frac{1}{2} \int_s^t f''(B_x) \, dx, 
+\quad s < t.
+\end{equation}
+\textbf{Exemplo:}  
+Escolha $f(t) = t^2$. Então, $f'(t) = 2t$ e $f''(t) = 2$. Assim, o Lema de Itô fornece, para $s < t$, \textcite{Mikosh}[p.115]
+$$
+B_t^2 - B_s^2 = 2 \int_s^t B_x \, dB_x + \int_s^t dx.
+$$
+
+Para $s = 0$, obtemos  
+$$
+\int_0^t B_x \, dB_x = \frac{1}{2} (B_t^2 - t).
+$$
+
+\subsection{Lema de Itô para uma função de duas variáveis}
+
+Seja $f(t, x)$ uma função cujas derivadas parciais de segunda ordem são contínuas. Então \parencite [p.~117] {Mikosh}:
+\begin{equation}
+f(t, B_t) - f(s, B_s) 
+= \int_s^t \left[ f_1(x, B_x) + \frac{1}{2} f_{22}(x, B_x) \right] dx 
++ \int_s^t f_2(x, B_x) \, dB_x,
+\quad s < t
+\end{equation}
+com as derivadas parciais:
+
+\[
+f_1(t, z) = \frac{\partial f(t, z)}{\partial t}, \quad
+f_2(t, z) = \frac{\partial f(t, z)}{\partial z}, \quad
+f_{22}(t, z) = \frac{\partial^2 f(t, z)}{\partial z^2}.
+\]
+
+
+\section{Equações Diferenciais Estocásticas}
+
+%\subsection{Introdução}
+
+Esta seção é dedicada ao estudo das EDEs e suas soluções. Inicialmente, apresenta-se uma breve introdução às equações diferenciais ordinárias (EDOs), destacando seu caráter determinístico e a forma como podem ser interpretadas quando sujeitas a perturbações por ruído aleatório. Em seguida, aborda-se a formulação das EDEs e os métodos para sua solução.
+
+\subsection{Equações Diferenciais Determinísticas}
+
+A teoria das equações diferenciais é um pilar fundamental do cálculo clássico. Essas equações modelam a evolução de sistemas dinâmicos ao longo do tempo, sendo amplamente aplicadas em diversas áreas da ciência e engenharia.
+
+A forma geral de uma equação diferencial ordinária pode ser escrita como:
+$$
+f(t, x(t), x'(t), \dots) = 0, \quad 0 \leq t \leq T,
+$$
+onde $t$ representa o tempo, $x(t)$ é uma função desconhecida e $x'(t)$ denota sua derivada. A solução dessa equação consiste em uma função $x(t)$ que satisfaz essa relação \parencite [p.~132] {Mikosh}.
+
+\subsection{Equações Diferenciais Estocásticas de Itô}
+
+Enquanto as equações diferenciais ordinárias descrevem sistemas determinísticos, muitas aplicações exigem a incorporação de ruído aleatório. Isso nos leva ao conceito de equações diferenciais estocásticas EDEs, fundamentais para modelar processos que evoluem sob influência de incerteza.
+
+Uma equação diferencial estocástica de Itô é definida como \parencite [p.~135] {Mikosh}:
+\begin{equation}
+dX_t = a(t, X_t)\,dt + b(t, X_t)\,dB_t, \quad X_0 = Y(\omega).
+\end{equation}
+
+
+Essa equação envolve dois termos principais: a tendência (drift) \(a(t, X_t)\,dt\), que representa a tendência 
+determinística do sistema, e o ruído ou volatilidade \(b(t, X_t)\,dB_t\), responsável pela 
+componente aleatória do processo. A solução \(X_t\), ou seja, o processo associado a uma equação diferencial 
+estocástica de Itô, é chamada de processo de difusão \parencite [p.~137] {Mikosh}.
+
+Dado que $B_t$ possui caminhos não diferenciáveis, a equação diferencial tradicional perde o significado e precisa ser reformulada em termos de integrais estocásticas, o que leva à definição da equação diferencial estocástica de Itô:
+
+\begin{equation}
+X_t = X_0 + \int_0^t a(s, X_s)\,ds + \int_0^t b(s, X_s)\,dB_s,  \quad 0 \leq t \leq T.
+\end{equation}
+
+A segunda integral é a integral de Itô e requer o uso do cálculo estocaśtico, pois difere das integrais usuais de Riemann ou Lebesgue.  
+O termo driving process (ou processo dirigidor) refere-se ao processo estocástico que 
+impulsiona a dinâmica da EDE. Dessa forma, o movimento browniano é chamado de driving process da equação (4.2) \parencite [p.~136] {Mikosh}.
+
+
+\subsection{Encontrando a Solução de EDEs de Itô pela Fórmula de Itô}
+
+Para resolver algumas EDEs de Itô, podemos utilizar uma ferramenta apresentada na seção anterior: o Lema de Itô, que pode ser empregado para encontrar soluções explícitas. A seguir, apresentamos dois exemplos importantes:
+%Um caso especial são as EDEs lineares, que possuem soluções únicas em intervalos finitos.
+
+\subsubsection{Exemplo: Movimento browniano Geométrico}
+
+O movimento browniano geométrico pode ser definido como a solução da equação:
+
+
+\begin{equation}
+    dX_t = \mu X_t dt + \sigma X_t dB_t,
+\end{equation}
+onde $\mu$ e $\sigma$ são constantes, ou
+\begin{equation}
+    X_t = X_0 + \mu \int_0^t X_s ds + \sigma \int_0^t X_s dB_s.
+\end{equation}
+
+Este processo é amplamente utilizado na modelagem de preços de ativos financeiros.
+
+Utilizando a fórmula de Itô podemos encontrar a solução da seguinte forma. Suponhamos que $X_t = f(t, B_t)$ para alguma função suave $f(t, x)$ sendo $f \in C^{2}$, ou seja, possui derivadas de primeira e segunda ordem contínuas. Pela fórmula de Itô, temos
+
+\begin{equation}
+    X_t = f(t, B_t) = X_0 + \int_0^t \left( \frac{\partial f}{\partial t} (s, B_s) + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} (s, B_s) \right) ds
+    + \int_0^t \frac{\partial f}{\partial x} (s, B_s) dB_s.
+\end{equation}
+
+Comparando (4.4) com (4.5), temos (existe unicidade de representação como processo de Itô):
+
+\begin{equation}
+    \frac{\partial f}{\partial t} (t, x) + \frac{1}{2} \frac{\partial^2 f}{\partial x^2} (t, x) = \mu f(t, x),
+\end{equation}
+
+\begin{equation}
+    \frac{\partial f}{\partial x} (t, x) = \sigma f(t, x).
+\end{equation}
+
+Derivando a equação (4.7), obtemos
+
+\[
+\frac{\partial^2 f}{\partial x^2} (t, x) = \sigma \frac{\partial f}{\partial x} (t, x) = \sigma^2 f(t, x),
+\]
+
+e substituindo em (4.6), temos que
+
+\[
+\left( \mu - \frac{1}{2} \sigma^2 \right) f(t, x) = \frac{\partial f}{\partial t} (t, x).
+\]
+
+Por separação de variáveis $f(t, x) = g(t) h(x)$, obtemos
+
+\[
+\frac{\partial f}{\partial t} (t, x) = g'(t) h(x),
+\]
+
+e
+
+\[
+g'(t) = \left( \mu - \frac{1}{2} \sigma^2 \right) g(t),
+\]
+
+que é uma EDO linear com solução:
+
+\[
+g(t) = g(0) \exp \left[ \left( \mu - \frac{1}{2} \sigma^2 \right) t \right].
+\]
+
+Usando a equação (4.7), obtemos a EDO linear $h'(x) = \sigma h(x)$ cuja a solução é $h (x) = h(x)exp(\sigma x)$ sendo $f(0,0)$ a condição inicial, temos:
+
+\[
+f(t, x) = f(0,0) \exp \left[ \left( \mu - \frac{1}{2} \sigma^2 \right) t + \sigma x \right].
+\]
+
+Conclusão: a solução da EDE (4.3) é o processo
+
+\begin{equation}
+X_t = f (t, B_t) = X_0 \exp \left[ \left( \mu - \frac{1}{2} \sigma^2 \right) t + \sigma B_t \right],
+\label{eq:mbg}
+\end{equation}
+que é precisamente o movimento browniano geométrico. Dessa forma, o movimento browniano geométrico trata-se de um processo de difusão associado à equação (4.3) \parencite [p.~140] {Mikosh}. Note-se que se obteve a solução da EDE resolvendo uma equação diferencial parcial EDP determinística, mas a solução é uma variável aleatória. Como $B_t$ tem distribuição normal, $X_t$ tem distribuição log-normal.
+
+%Para verificar que (4.8) satisfaz a EDE (4.3) ou (4.4), basta aplicar a fórmula de Itô a $X_t = f (t, B_t)$, co
+
+%\[
+%f (t,x) = X_0 \exp \left[ \left( \mu - %\frac{1}{2} \sigma^2 \right) t + \sigma x %\right].
+%\]
+
+%\[
+%X_t = X_0 + \int_0^t \left[ \left( \mu - %\frac{1}{2} \sigma^2 \right) X_s + %\frac{1}{2} \sigma^2 X_s \right] ds + %\int_0^t \sigma X_s dB_s
+%\]
+
+%\[
+%= X_0 + \mu \int_0^t X_s ds + \sigma \int_0^t X_s dB_s,
+%\]
+
+%ou
+
+%\[
+%dX_t = \mu X_t dt + \sigma X_t dB_t
+%\]
+%E a EDE é satisfeita pelo movimento browniano geométrico. [p. 140, Mikosh]
+
+\subsubsection{Exemplo: Equação de Langevin e Processo de Ornstein-Uhlenbeck}
+
+A equação de Langevin (1908) modela a velocidade de uma partícula browniana. Escrevendo-a como:
+
+\begin{equation}
+X_t = X_0 + \int_0^t c\, X_s \, ds + \int_0^t \sigma \, dB_s,
+\end{equation}
+temos um caso de ruído aditivo, cuja a solução é o processo 
+\begin{equation}
+X_t = e^{ct} X_0 + \sigma e^{ct} \int_0^t e^{-cs}\, dB_s.
+\end{equation}
+
+Se tivermos uma condição inicial $X_0$ constante, a função é conhecida como  processo de Ornstein-Uhlenbeck, fundamental em modelagem financeira e estatística \parencite [p.~141] {Mikosh}.
+
+
+%As equações diferenciais estocásticas desempenham um papel essencial na modelagem de sistemas com incerteza. As soluções podem ser obtidas por métodos analíticos, como o Lema de Itô, ou por métodos numéricos. O estudo de processos específicos, como o movimento browniano geométrico e o processo de Ornstein-Uhlenbeck, fornece ferramentas fundamentais para aplicações em finanças, física e estatística.
+
+
+\subsection{Métodos Numéricos para Solução de Equações Diferenciais Estocásticas}
+
+
+Muitas vezes, ao resolver uma equação diferencial estocástica (EDE), não é possível encontrar sua solução explícita. 
+Nesses casos, recorremos a métodos numéricos, que são algoritmos iterativos capazes de fornecer um conjunto de pontos 
+que aproximam a trajetória da solução. Como a solução de uma EDE é uma distribuição de probabilidade, a partir das 
+trajetórias obtidas numericamente é possível aproximar a distribuição da solução. Consideramos a seguinte equação diferencial estocástica:
+\begin{equation}
+    dX_t = a(X_t)\,dt + b(X_t)\,dB_t, \quad t \in (0,T).
+\end{equation}
+
+Uma solução numérica \(X^{(n)} = (X_t^{(n)}, t \in [0,T])\) da equação (4.11) representa uma aproximação de uma trajetória que o processo estocástico pode seguir. A partir de inúmeras trajetórias simuladas, é possível estimar a distribuição que aproxima a solução exata \(X = (X_t, t \in [0,T])\).
+
+Para a discretização do intervalo \([0,T]\), consideramos uma partição \(0 = t_0 < t_1 < \dots < t_n = T\), com \(\Delta_i = t_i - t_{i-1}\) e \(\Delta_i B = B_{t_i} - B_{t_{i-1}}\), para \(i = 1, \dots, n\).
+
+
+
+%\textcolor{red}{A solução é uma distribuição de probabilidade. Logo, uma trajetória não é uma solução. Explique melhor}
+
+\subsubsection{Método de Euler (Euler-Maruyama)}  
+
+O método de Euler-Maruyama fornece a seguinte aproximação numérica para a solução da EDE: \textcite{Mikosh}(p.159)
+\begin{equation}
+    X_{t_{i}}^{(n)} = X_{t_{i-1}}^{(n)} + a(X_{t_{i-1}}^{(n)}) \Delta_n + b(X_{t_{i-1}}^{(n)}) \Delta_i B.
+    \label{eq:euler}
+\end{equation}  
+
+\subsubsection{Método de Milstein}  
+
+A aproximação de Milstein melhora a aproximação de Euler para equações diferenciais estocásticas, incorporando um termo corretivo adicional que envolve os incrementos quadráticos do movimento browniano. Partindo da equação diferencial estocástica, a aproximação de Euler considera a discretização dos integrais nos pontos da partição, aproximando $a(X_t)$ e $b(X_t)$ por seus valores nos instantes anteriores. A aproximação de Milstein aplica a expansão de Taylor-Itô aos integrandos, o que leva à inclusão do termo
+\begin{equation}
+\frac{1}{2} b(X_{t_{i-1}}^{(n)})\,b'(X_{t_{i-1}}^{(n)})\left[(\Delta_i B)^2 - \Delta_i\right], 
+\end{equation}
+que corrige o esquema de Euler, resultando no método
+\begin{equation}
+    X_{t_i}^{(n)} = X_{t_{i-1}}^{(n)} + a(X_{t_{i-1}}^{(n)})\,\Delta_i + b(X_{t_{i-1}}^{(n)})\,\Delta_i B 
++ \frac{1}{2} b(X_{t_{i-1}}^{(n)})\,b'(X_{t_{i-1}}^{(n)})\left[(\Delta_i B)^2 - \Delta_i\right]. 
+ \label{eq:milstein}
+\end{equation}
+
+Esse termo adicional decorre da aplicação do lema de Itô e da avaliação de integrais estocásticos duplos, proporcionando maior precisão na simulação de trajetórias estocásticas. Além disso, ele melhora a ordem de convergência em relação ao método de Euler-Maruyama \parencite [p.~164] {Mikosh}. 
+
+
+\section{Aplicações do Cálculo Estocástico em Finanças}
+
+O desenvolvimento do cálculo estocástico revolucionou a modelagem dos mercados financeiros, proporcionando avanços significativos na compreensão e precificação de ativos de risco. Desde os trabalhos pioneiros de Black, Scholes e Merton na década de 1970, os processos estocásticos tornaram-se ferramentas essenciais para a análise de preços de ações, índices, taxas de câmbio e juros. Nesta seção, exploraremos a derivação da fórmula de Black-Scholes, um dos modelos mais influentes da teoria financeira, aplicado à precificação de opções de compra europeias.
+\subsection{Modelagem do Preço do Ativo e do Ativo Sem Risco}
+
+\subsubsection{O Ativo de Risco}
+
+Seja $X_t$ o preço de um ativo de risco (por exemplo, uma ação) no tempo $t$. O modelo adotado é o movimento browniano geométrico, dado pela equação
+\begin{equation}
+X_t = f (t, B_t) = X_0 \exp \left[ \left( \mu - \frac{1}{2} \sigma^2 \right) t + \sigma B_t \right],
+\label{eq:mbg}
+\end{equation}
+onde:
+\begin{itemize}
+    \item $X_0$ é o preço inicial do ativo;
+    \item $B=(B_t,\, t\ge 0)$ representa o movimento browniano, que modela as oscilações aleatórias do mercado;
+    \item $\mu
+ > 0$ é uma constante que representa a taxa de retorno, indicando a tendência de crescimento do ativo.
+    \item $\sigma>0$ é a volatilidade, que mede a intensidade das oscilações aleatórias.
+\end{itemize}
+
+Este modelo é justificado pelo fato de que $X_t$ é a única solução da equação diferencial estocástica (EDS) (4.3) \parencite [p.~168] {Mikosh}. 
+
+
+A interpretação desta equação é a seguinte: no intervalo $[t, t+dt]$, o retorno relativo do ativo é
+\begin{equation}
+    \frac{X_{t+dt} - X_t}{X_t} \simeq\mu \, dt + \sigma \, dB_t. 
+\end{equation}
+Aqui, o termo $\mu\, dt$ representa o crescimento determinístico, enquanto $\sigma \, dB_t$ introduz a incerteza inerente ao mercado. Se $\sigma=0$, teríamos um crescimento exponencial puro, $X_t = X_0 e^{\mu t}
+$, mas a presença de $\sigma$ nos leva a modelar flutuações reais observadas nos preços dos ativos.
+
+\subsubsection{O Ativo Sem Risco}
+
+Em paralelo ao ativo de risco, consideramos um ativo sem risco, tipicamente representado por uma conta bancária ou título público, que rende juros a uma taxa fixa $r>0$. O montante investido evolui segundo
+\begin{equation}
+    \beta_t = \beta_0 e^{rt}.
+\end{equation}
+Note que é solução da EDO 
+\begin{equation}
+    \beta_t = \beta_0 + r \int_0^t \beta_s \, ds.
+\end{equation}
+Essa idealização simplifica a análise, uma vez que o ativo sem risco apresenta comportamento determinístico e serve de referência para a comparação com ativos de risco \parencite [p.~169] {Mikosh}.
+
+\subsection{Composição do Portfólio e Estratégia Autofinanciada}
+
+Um investidor geralmente compõe um portfólio diversificando entre ativos de risco e ativos sem risco. Denotamos por $a_t$ a quantidade investida em ações e por $b_t$ a quantidade investida em títulos, de forma que o valor total do portfólio no tempo $t, \: V_t,$ seja
+\begin{equation}
+    V_t = a_t X_t + b_t \beta_t.
+\end{equation}
+
+Uma estratégia de investimento é dita autofinanciada se as variações no valor do portfólio decorrem unicamente da evolução dos preços dos ativos, sem a injeção ou retirada de capital. Matematicamente, essa condição é expressa por
+\begin{equation}
+    dV_t = a_t \, dX_t + b_t \, d\beta_t,
+\end{equation}
+ou, no sentido de Itô,
+\begin{equation}
+    V_t - V_0 = \int_0^t a_s \, dX_s + \int_0^t b_s \, d\beta_s.
+\end{equation}
+
+Para o ativo sem risco, note que
+\begin{equation}
+    d\beta_t = r \beta_t \, dt,
+\end{equation}
+e, portanto, a alocação em títulos pode ser relacionada ao valor do portfólio pela fórmula
+\begin{equation}
+    b_t = \frac{V_t - a_t X_t}{\beta_t}.
+\end{equation}
+
+\subsection{Precificação de Opções: Conceitos e Formulação do Problema}
+
+
+As opções são derivativos financeiros cujo valor depende do comportamento de um ativo subjacente, geralmente modelado por equações diferenciais estocásticas. Elas conferem ao seu titular o direito, mas não a obrigação, de negociar um ativo por um preço pré-determinado K, denominado preço de exercício ou strike, em uma data de vencimento T ou antes dela, dependendo do tipo de opção. Uma opção de venda (put) europeia concede ao titular o direito de vender o ativo subjacente por K na data T, com payoff \( (K - X(T))^{+} \). De forma análoga, uma opção de compra (call) europeia garante o direito de adquirir o ativo pelo preço K em T, com payoff \( (X(T) - K)^{+} \). Quanto à forma de exercício, as opções do tipo europeia só podem ser exercidas na data de vencimento, enquanto as do tipo americana permitem o exercício a qualquer momento até T.
+
+%No caso específico de uma opção de compra europeia, o payoff — isto é, o valor recebido no vencimento — é dado por
+%\begin{equation}
+%    (X_T - K)^+ = \max(0, X_T - K) =
+%    \begin{cases}
+%        X_T - K, & \text{se } X_T > K, \\
+%        0, & \text{se } X_T \leq K.
+%    \end{cases}
+%\end{equation}
+
+A questão central na precificação de opções é determinar quanto um investidor estaria disposto a pagar hoje (\( t = 0 \)) para adquirir esse direito, considerando que é possível replicar o payoff por meio de uma estratégia de hedge utilizando ativos disponíveis no mercado \parencite[p.~170]{Mikosh}. Com base nos fundamentos de finanças discutidos em \textcite{Hull}, o valor justo de uma opção depende de fatores como a volatilidade \( \sigma \) do ativo, a taxa de juros livre de risco \( r \), o preço inicial \( X_0 \) e o tempo até o vencimento  T . Matematicamente, a precificação corresponde ao cálculo do valor esperado do payoff futuro, descontado à taxa livre de risco.
+
+
+\subsubsection{Formulação do Problema de Precificação}
+
+Para replicar o payoff da opção, suponha que existe uma função determinística e suave $u(t,x)$ tal que o valor do portfólio no tempo $t$ possa ser escrito como
+\begin{equation}
+    V_t = a_t X_t + b_t \beta_t = u(T - t, X_t), \quad t \in [0,T].
+\end{equation}
+Essa hipótese implica que o valor do portfólio depende de forma contínua e diferenciável do tempo e do preço do ativo. A condição terminal, ou seja, o valor do portfólio no vencimento $T$, deve coincidir com o payoff da opção:
+\begin{equation}
+    u(0, x) = (x - K)^+, \quad x > 0.
+\end{equation}
+
+Dessa forma, o problema consiste em encontrar a função $u(t,x)$ que, quando avaliada em $t = T$ e no preço atual $X_0$, fornece o valor justo da opção \parencite [p.~172] {Mikosh}:
+
+\begin{equation}
+    V_0 = u(T, X_0).
+\end{equation}
+
+\subsection{Derivação da Equação de Black--Scholes}
+
+Para determinar $u(t,x)$, aplicamos o lema de Itô à função composta
+\[
+f(t,x)=u(T-t,x),
+\]
+lembrando que as derivadas de $f$ relacionam-se com as de $u$ por
+\[
+f_1(t,x) = -u_1(T-t,x), \quad f_2(t,x) = u_2(T-t,x), \quad f_{22}(t,x)= u_{22}(T-t,x).
+\]
+
+Dado que o ativo $X_t$ segue a dinâmica (4.3),
+\begin{equation}
+    X_t = X_0 + \mu \int_0^t X_s \, ds + \sigma \int_0^t X_s \, dB_s,
+\end{equation}
+podemos aplicar uma extensão do lema de Itô, conforme visto em \textcite{Mikosh} (p.~120), resultando na seguinte igualdade
+\begin{align}
+    V_t - V_0 &= f(t, X_t) - f(0, X_0) \notag \\
+    &= \int_0^t \left[ f_1(s, X_s) + \mu X_s f_2(s, X_s) 
+       + 0.5 \, \sigma^2 X_s^2 f_{22}(s, X_s) \right] ds \notag \\
+    &\quad + \int_0^t \left[ \sigma X_s f_2(s, X_s) \right] dB_s \notag \\
+    &= \int_0^t \left[ -u_1(T - s, X_s) + \mu X_s u_2(T - s, X_s) 
+       + 0.5 \, \sigma^2 X_s^2 u_{22}(T - s, X_s) \right] ds \notag \\
+    &\quad + \int_0^t \left[ \sigma X_s u_2(T - s, X_s) \right] dB_s. 
+\end{align}
+
+Por outro lado, utilizando a condição de autofinanciamento da estratégia (5.7),
+e, substituindo $dX_t = \mu X_t\, dt + \sigma X_t\, dB_t$ e $d\beta_t = r\beta_t\, dt$, junto com a relação (5.9), chega-se à expressão
+\begin{equation}
+    V_t - V_0 = \int_0^t \left[(\mu - r) a_s X_s + r V_s\right] ds + \int_0^t \left[\sigma a_s X_s\right] dB_s. 
+\end{equation}
+
+Ao comparar as expressões (5.14) e (5.15), observamos que os coeficientes dos termos em $ds$ e $dB_s$ devem ser iguais, uma vez que ambas as representações descrevem o mesmo movimento do portfólio. Dessa comparação, obtemos a identificação imediata:
+\begin{equation}
+    a_t = u_2(T - t, X_t), 
+\end{equation}
+\[
+(\mu - r) a_t X_t + r u(T - t, X_t) = (\mu - r) u_2(T - t, X_t) X_t + r u(T - t, X_t)
+\]
+
+\[
+= -u_1(T - t, X_t) + \mu X_t u_2(T - t, X_t) + 0.5 \sigma^2 X_t^2 u_{22}(T - t, X_t).
+\]
+
+Impondo a igualdade dos termos determinísticos para qualquer valor de $X_t > 0$, obtemos a seguinte equação diferencial parcial:
+\begin{equation}
+    u_1(t, x) = 0.5 \, \sigma^2 x^2 u_{22}(t, x) + r x u_2(t, x) - r u(t, x), 
+ x > 0,\quad t \in [0, T].
+\end{equation}
+Ou seja, 
+
+
+\begin{equation}
+    \frac{\partial u}{\partial t}(t,x) = \frac{1}{2}\sigma^2 x^2 \frac{\partial^2 u}{\partial x^2}(t,x) + r x \frac{\partial u}{\partial x}(t,x) - r u(t,x),
+\end{equation}
+definida para $x > 0$ e $t \in [0,T]$, sujeita à condição terminal (5.11).
+
+Esta PDE, conhecida como equação de Black--Scholes, encapsula a dinâmica do valor da opção sob a hipótese de ausência de arbitragem e de replicação perfeita por meio de uma estratégia autofinanciada.
+
+\subsubsection{Solução da Equação de Black--Scholes e a Fórmula de Precificação}
+
+Observa-se que a equação~(5.18) admite uma solução explícita. Conforme \textcite[p.~174]{Mikosh}, a solução da PDE, com a condição terminal~(5.11), é dada por
+
+\begin{equation}
+    u(t, x) = x \, \Phi(g(t, x)) - K e^{-rt} \Phi(h(t, x)),
+\end{equation}
+onde
+\begin{equation}
+    g(t, x) = \frac{\ln(x/K) + (r + 0.5 \sigma^2) t}{\sigma t^{1/2}},
+\end{equation}
+\begin{equation}
+    h(t, x) = g(t, x) - \sigma t^{1/2},
+\end{equation}
+e
+\begin{equation}
+    \Phi(x) = \frac{1}{(2\pi)^{1/2}} \int_{-\infty}^{x} e^{-y^2/2} \, dy, 
+    \quad x \in \mathbb{R}
+\end{equation}
+representa a função de distribuição acumulada da normal padrão.
+
+Portanto, o valor justo da opção europeia com preço de exercício $K$ no tempo $t = 0$ é
+\begin{equation}
+    V_0 = u(T, X_0) = X_0 \Phi(g(T, X_0)) - K e^{-rT} \Phi(h(T, X_0)), 
+\end{equation}
+e a função $u(T-t,X_t)$ fornece o valor do portfólio que, através de uma estratégia de hedge, replica exatamente o payoff $(X_T-K)^+$ no vencimento.
+
+Além disso, a estratégia de hedge é definida pelas quantidades
+\begin{equation}
+    a_t = u_2(T - t, X_t) \quad \text{e} \quad 
+    b_t = \frac{u(T - t, X_t) - a_t X_t}{\beta_t}, 
+\end{equation}
+garantindo que a carteira se mantenha autofinanciada e que os ganhos (ou perdas) decorrentes dos movimentos do mercado sejam idênticos aos da opção. A fórmula de Black-Scholes mostra que o preço da opção é independente da taxa de retorno $\mu$, pois a estratégia de hedge ("proteção") elimina o risco, dependendo apenas da volatilidade \(\sigma\), da taxa livre de risco \(r\), do preço de exercício \(K\) e do tempo até o vencimento \(T\), fundamentando a precificação na ausência de arbitragem e no equilíbrio de mercado.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CAPÍTULO 4 - SIMULAÇÕES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Simulações}
+
+Nesta seção apresentamos a aplicação de métodos de simulação para a precificação de opções europeias e americanas, comparando os resultados com os valores teóricos e avaliando a eficiência dos métodos. Os algoritmos foram implementados em Python (Google Colab) e o repositório encontra-se em \textcite{simulacoes2025}.
+
+
+%\subsection{Precificação de Opções}
+
+\subsection{Opções Europeias}
+
+Para a precificação de opções europeias, utilizou-se o método de Monte Carlo por meio de quatro diferentes abordagens, com o objetivo de comparar os resultados obtidos com a solução analítica fornecida pelo modelo de Black-Scholes. As trajetórias necessárias para a aplicação do método serão geradas por simulação direta do movimento browniano geométrico, com e sem o uso de variáveis antitéticas, bem como pela solução da equação diferencial estocástica (EDE) utilizando os métodos de Euler e de Milstein. A equação diferencial de Black--Scholes--Merton não depende das preferências de risco, pois o retorno esperado $\mu$ da ação desaparece de sua derivação. Isso permite adotar o pressuposto de que todos os investidores são neutros ao risco (risk-neutral). Nesse cenário, o retorno esperado de qualquer ativo é igual à taxa livre de risco r, pois não é exigido prêmio pelo risco \textcite[p.~357]{Hull}. Consequentemente, o valor presente de um fluxo de caixa é obtido descontando seu valor esperado a r, o que simplifica a análise e a precificação de derivativos.
+
+Embora o modelo de Black--Scholes ofereça uma solução analítica para o preço de opções europeias, neste trabalho empregamos simulações Monte Carlo para demonstrar sua eficácia. A evolução do ativo é dada por \textcite[p.~508]{Hull}:
+
+\begin{equation}
+X(t + \Delta t) = X(t) \exp \Big[ (\mu - \tfrac{1}{2}\sigma^2) \Delta t + \sigma \, \epsilon \, \sqrt{\Delta t} \Big],
+\end{equation}
+onde $X(0)$ é o valor inicial, $\mu$ a taxa livre de risco, $\sigma$ a volatilidade e $\epsilon \sim \mathcal{N}(0,1)$. A partir de $X(0)$, é possível simular a trajetória do ativo ao longo do tempo, utilizando incrementos do movimento browniano padrão $B_t$ em intervalos $\Delta t$, representados como $\Delta B_t = \epsilon \sqrt{\Delta t}$. Assim, cada passo de tempo incorpora a componente aleatória necessária para a simulação Monte Carlo, permitindo gerar diferentes cenários para o preço do ativo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{imagens/simulacoes.png}
+    \caption{\small Simulações de 10 trajetórias do movimento Browniano geométrico, com os parâmetros: preço inicial \(X_0 = 50\), \(\sigma = 0.4\) e \(\mu = 0.1\).}
+    \label{fig:simulacoes}
+\end{figure}
+
+
+
+
+
+\subsubsection{Metodologia do Método de Monte Carlo}
+
+Para aplicar o método de Monte Carlo à precificação da opção, geramos diversas trajetórias do preço do ativo no tempo T, utilizando a equação de precificação sob a medida neutra ao risco (6.1). Em cada trajetória, calculamos o payoff da opção europeia de compra, dado por $\max(X(T) - X, 0)$, na data de vencimento. Em seguida, obtemos a média dos payoffs simulados e a descontamos ao valor presente utilizando a taxa de juros $r$. A ideia central do método consiste em estimar o valor esperado de uma variável aleatória por meio da média aritmética de uma sequência de realizações independentes dessa variável. A fundamentação teórica apoia-se na Lei dos Grandes Números, cujo enunciado pode ser consultado no Teorema 2.1.1 de \textcite{silva2012}. Quanto menor for o $\Delta t$ melhor serão as aproximações das trajetórias, e quanto maior o número de trajetórias, melhor serão as estimativas da média da distribuição. 
+
+
+
+\subsubsection{Redução de Variância: Variáveis Antitéticas}
+
+A redução da variância é essencial no método de Monte Carlo, pois permite obter intervalos de confiança mais estreitos e estimativas mais precisas. Uma técnica amplamente utilizada é o uso de variáveis antitéticas, que \textcite{silva2012} define como um par \( (X, Y) \) de variáveis aleatórias com a mesma distribuição, mas correlação negativa. Nesse caso, valores altos de uma tendem a ser acompanhados de valores baixos da outra, e vice-versa. Para entender a redução da variância por variáveis antitéticas, analisamos a variância da média aritmética de um par \( (X, Y) \) antitético, dada por:
+
+
+
+\[
+\text{Var}\left(\frac{X+Y}{2}\right) = \frac{1}{4} \left(\text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X,Y)\right)
+= \frac{1}{2} \left(\text{Var}(X) + \text{Cov}(X,Y)\right)
+\]
+Como \( X \) e \( Y \) são negativamente correlacionados, temos que \( \text{Cov}(X, Y) \leq 0 \), o que resulta em:
+
+\[
+\text{Var}\left(\frac{X+Y}{2}\right) \leq \frac{1}{2}\text{Var}(X)
+\] 
+
+Portanto, ao utilizar pares antitéticos, a variância da média será menor do que a variância de \( X \) ou \( Y \) individualmente. Além disso, $\frac{1}{2}\text{Var}(X)$ é a variância  da média entre $X$ e $Y$, quando elas forem independentes. Essa redução de variância é especialmente útil em simulações de preços de ativos, onde o valor do ativo \( X_t \) é modelado pela equação:
+
+\[
+X_t = X_0 \exp\left( \left(\mu - \frac{\sigma^2}{2}\right)t + \sigma B_t \right) = X_0 \exp\left( \left(\mu - \frac{\sigma^2}{2}\right)t + \sigma \sqrt t z \right)
+\]
+
+Nesse contexto, busca-se reduzir a variância da função \( \exp(z) \), onde \( z \sim N(0,1) \).
+
+%\subsection{Monotonicidade e Correlação entre \( \exp(z) \) e \( \exp(-z) \)}
+
+Como \( \exp(x) \) é uma função monótona crescente, segue que \(- \exp(-x) \) também apresenta monotonicidade crescente. Pelo Lema 2.2.1 de \textcite{silva2012}, que estabelece que, se \(f\) e \(g\) são funções monótonas crescentes, então, para qualquer variável aleatória \(X\), vale \(\text{Cov}(f(X), g(X)) \geq 0\). A partir disso, podemos deduzir a relação \(\text{Cov}(\exp(x), -\exp(-x)) \geq 0\) e, consequentemente, \(\text{Cov}(\exp(x), \exp(-x)) \leq 0\). Isso significa que as funções \( \exp(z) \) e \( \exp(-z) \) são variáveis antitéticas. Em outras palavras, podemos garantir que \( \exp(-z) \) é a variável antitética de \( \exp(z) \), o que permite reduzir a variância ao utilizar essas duas variáveis em simulações de Monte Carlo.
+ 
+\subsubsection{Exemplo de aplicação}
+
+Como no caso das opções europeias existe uma solução analítica, é possível verificar diretamente o desempenho do método de estimação por simulação. Como exemplo, considere uma opção de compra com os seguintes parâmetros: $X_0 = 50$, $K = 45$, $\sigma = 0.4$, $r = 0.1$. O preço teórico da opção, calculado pela fórmula de Black–Scholes (5.25), é de R\$ 6.248.  
+Na simulação, adotou-se $T = 30/252$, que corresponde ao tamanho do passo $\Delta t$ nas equações (\ref{eq:euler}) e (\ref{eq:milstein}). Considerando um ano com 252 dias úteis, a escolha do número de passos seguiu os mesmos parâmetros, variando apenas o número de passos, como ilustrado na Tabela~\ref{tab:precos_metodos_passos}. Observa-se que, à medida que o número de passos aumenta, a aproximação do preço teórico melhora. Um número de 1000 passos é considerado adequado, pois proporciona boa precisão com custo computacional razoável, evitando tempos de cálculo excessivos com valores maiores.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{
+Preços estimados da opção (em R\$) por diferentes métodos e números de passos. Preço teórico R 6.248. Simulações realizadas com \(M = 100000\) trajetórias. Entre parênteses temos os erros padrões das estimativas do preço.
+}
+\vspace{0.5em}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Método} & \multicolumn{3}{c|}{\textbf{Número de Passos}} \\
+\cline{2-4}
+                & \textbf{10} & \textbf{100} & \textbf{1000} \\
+\hline
+GBM        & 6{.}198  (0{.}019) & 6{.}227 (0{.}019) & 6{.}237 (0{.}019) \\
+Euler      & 6{.}261  (0{.}019) & 6{.}262 (0{.}019) & 6{.}254 (0{.}019) \\
+Milstein   & 6{.}264  (0{.}019) & 6{.}223 (0{.}019) & 6{.}235 (0{.}019) \\
+\hline
+\end{tabular}
+\label{tab:precos_metodos_passos}
+\end{table}
+
+
+
+Para estudar o efeito do número de trajetórias, consideramos (\( 100 \), \( 1000 \), \( 10000 \), \( 100000 \)) trajetórias. O preço teórico da opção, pela fórmula de Black–Scholes, foi de R\$~6{.}2476. O ativo foi modelado por uma equação diferencial estocástica (EDE), cuja solução analítica é o movimento Browniano geométrico (MBG), expresso na equação (4). As trajetórias são simuladas e o método de Monte Carlo (MC) é aplicado. A Tabela~\ref{tab:precos_metodos_1000passos} apresenta os resultados baseados em diferentes número de trajetórias. São apresentados os resultados quando as  trajetórias foram geradas pelos métodos  Euler–Maruyama e Milstein. Adicionalmente, as variáveis antitéticas utilizadas foram as utilizadas em \textcite[seção 2.2.1]{silva2012}. Para se ter uma ideia das incertezas nas amostras dadas pelas trajetórias, em MC (MBG) consideramos amostras da distribuição verdadeira no final do período dada pela equação (\ref{eq:mbg}). Em MC (Antitético) são dadas as mesmas estimativas dadas em MC (MBG) quando são utilizadas variáveis antitéticas.
+
+A análise dos resultados indica que: i) Em todos os casos as diferenças entre os valores estimados são menores do que dois erros padrões; ii) os erros padrões dos métodos de Euler-Maruayama e Milstein são próximos dos desvios padrões das estimativas  MC (MBG); iii)   o método de redução de variância, que utiliza variáveis antitéticas reduz bastante o erro padrão; e iv) o método de  Milstein teve desempenho ligeiramente superior ao de Euler–Maruyama.
+
+%Foi também realizado um estudo sobre o efeito tamanho dos passos, mas os resultados não são apresentados.
+
+%A precisão das estimativas depende da quantidade de passos e simulações, sendo essencial a escolha adequada dos métodos e parâmetros para estimativas consistentes na precificação de derivativos.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{
+Preços estimados da opção (em R\$) por diferentes métodos e números de trajetórias. Preço teórico: R\$~6{.}248. Entre parênteses temos os erros padrões das estimativas do preço estimado.
+}
+\vspace{0.5em}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Método} & \multicolumn{4}{c|}{\textbf{Número de Trajetórias}} \\
+\cline{2-5}
+                & \textbf{100} & \textbf{1000} & \textbf{10000} & \textbf{100000} \\
+\hline
+MC (MBG)                  & 6{.}441  (0{.}615) & 6{.}395 (0{.}190) & 6{.}210 (0{.}060) & 6{.}241  (0{.}019) \\
+MC (Antitético)           & 6{.}310 (0{.}171) & 6{.}259 (0{.}060) & 6{.}287 (0{.}019) & 6{.}248  (0{.}006) \\
+MC (Euler–Maruyama)       & 6{.}539 (0{.}563) & 6{.}084 (0{.}192) & 6{.}134 (0{.}059) & 6{.}274  (0{.}019) \\
+MC (Milstein)             & 6{.}046 (0{.}533) & 6{.}053 (0{.}186) & 6{.}287 (0{.}059) & 6{.}259 (0{.}019) \\
+\hline
+\end{tabular}
+\label{tab:precos_metodos_1000passos}
+\end{table}
+
+
+
+
+\subsection{Opções americanas }
+
+%No caso da precificação de opções americanas, o método utilizado foi algoritmo de Longstaff e Schwartz, que oferece uma abordagem eficiente e prática para a precificação desse tipo de opção, cuja principal característica é a possibilidade de exercício antecipado a qualquer momento até a data de vencimento. 
+
+\subsubsection{Algoritmo de Longstaff e Schwartz}
+
+O algoritmo proposto por Longstaff e Schwartz \textcite{longstaff2001valuing} apresenta uma abordagem eficiente e relativamente simples para a precificação de opções americanas. A principal inovação desse método está na aplicação de uma regressão por mínimos quadrados para estimar o valor esperado condicional do payoff futuro, considerando que o titular da opção faça a escolha racional de mantê-la ativa. Essa característica torna o algoritmo particularmente útil em contextos onde o valor da opção depende do histórico do ativo subjacente, como ocorre com as opções americanas. O método é implementado de forma retroativa, utilizando simulações de Monte Carlo para gerar os caminhos dos preços do ativo e, em seguida, aplicando regressões para aproximar o valor de continuação ao longo do tempo. Os passos do método, conforme descrito em \textcite{silva2012}, consideram que \((X^{j}_{1}, \ldots, X^{j}_{M})\) são os preços do ativo no caminho \(j\) no instante \(i\), \(Z^{j}_{i}\) é o valor intrínseco, \(r_{i}\) a taxa de juros entre os tempos \(i\) e \(i+1\), e \(U^{j}_{i}\) representa o preço da opção.
+
+Gere os caminhos \((X^{j}_{1}, \ldots, X^{j}_{M})\) para \(j = 1, \ldots, N\) e defina uma base de funções \(e = (e^{1}, \ldots, e^{m})\). Para cada \(j = 1, \ldots, N\), defina o valor da opção no vencimento como \(U^{j}_{M} = Z^{j}_{M}\). Em seguida, para \(i = N-1, \ldots, 1\), obtenha o vetor \(\alpha^{*}(i)\) resolvendo o problema de regressão linear da equação (3.2.1) de \textcite{silva2012}, calcule \(E(Z_{i+1} \,|\, X^{j}_{i}) = \langle \alpha^{*}(i), e \rangle\) e defina 
+\[
+U^{j}_{i} =
+\begin{cases}
+Z_{i}, & \text{se } Z_{i} \geq E(Z_{i+1} \,|\, X^{j}_{i}), \\
+\exp(-r_{i}) \, U^{j}_{i+1}, & \text{caso contrário}.
+\end{cases}
+\]
+Por fim, o valor estimado da opção é dado por \(\hat{U} = \frac{1}{N} \sum_{j=1}^{N} U^{j}_{1}\).
+
+
+\subsubsection{Exemplo de aplicação}
+Com base em \textcite{silva2012}, apresentamos os resultados do método de Longstaff-Schwartz (LSM) para a precificação de opções americanas de compra, conforme proposto originalmente em \textcite{longstaff2001valuing}. As simulações foram realizadas para a mesma opção ilustrada em \textcite[seção 3.2.3]{silva2012}, isto é, com preços iniciais \(X_0 = 28,\ 30,\ 32\), taxa de juros de 5\% ao ano, vencimento em 1 ano, preço de exercício de 30 e volatilidades de 10\%, 20\% e 40\%. Assim como em \textcite{silva2012}, foram  utilizadas 100.000 trajetórias em cada simulação de Monte Carlo, com 50 datas de exercício e para a base de funções, utilizou-se a de Laguerre, pois são as mesmas empregadas pelos criadores do método, com dimensão da base igual a 4.
+
+Foi realizado o mesmo experimento de \textcite[seção 3.2.3]{silva2012} para seleção das funções base. Para tanto,  é utilizado o fato de que o preço de uma opção americana sem pagamento de dividendos coincide com o de sua correspondente europeia, que como vimos, tem solução analítica. Comparando os preços estimados pelo (LSM),  constatamos que a dimensão 4 das funções de Laguerre foi suficiente para uma boa aproximação. 
+Como forma de verificação dos resultados obtidos pelo algoritmo implementado, foram utilizados como referência os valores apresentados na Tabela 3.3 da dissertação de \textcite{silva2012}, tanto para o método de Longstaff-Schwartz (LSM) quanto para o método binomial, ambos empregados na precificação de opções na referida obra. % O método (LSM) destaca-se por sua capacidade de lidar com o exercício antecipado, ao estimar a esperança condicional do valor futuro da opção por meio de regressões via mínimos quadrados. Isso permite capturar decisões ótimas de exercício ao longo do tempo, mesmo em cenários com trajetórias estocásticas complexas.
+
+Os resultados deste projeto foram comparados com os de \textcite[seção 3.2.3]{silva2012}, que utilizou os métodos LSM e binomial para precificação de opções. Os valores obtidos foram próximos, como mostrado na Tabela~\ref{tab:lsm}, evidenciando a confiabilidade dos algoritmos implementados. Os valores obtidos pelo método binomial servem como referência, e observa-se que, em alguns casos, os resultados apresentados por \textcite[seção 3.2.3]{silva2012} são superiores aos encontrados na nossa implementação e, em outros, inferiores.
+
+
+
+
+\begin{table}[H]
+\centering
+\scriptsize % Reduz o tamanho da fonte
+\renewcommand{\arraystretch}{1.1} % Ajusta o espaçamento vertical entre as linhas
+\caption{Preços estimados de opções americanas pelo método de Longstaff-Schwartz com 100.000 trajetórias, para diferentes volatilidades ($\sigma$) e valores iniciais ($X_0$). Na coluna LSMP, estão os valores simulados; nas colunas Silva (LSM) e Binomial, os valores apresentados em \textcite{silva2012}.}
+\vspace{2em}
+\label{tab:lsm}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+$\sigma$ 
+& \multicolumn{3}{c|}{$X_0 = 30$} 
+& \multicolumn{3}{c|}{$X_0 = 28$} 
+& \multicolumn{3}{c|}{$X_0 = 32$} \\
+\hline
+  & \textbf{LSMP} & \textbf{Silva} & \textbf{Binomial} 
+  & \textbf{LSMP} & \textbf{Silva} & \textbf{Binomial} 
+  & \textbf{LSMP} & \textbf{Silva} & \textbf{Binomial} \\
+\hline
+0.1 & 0.724 & 0.725 & 0.731 
+    & 1.994 & 1.989 & 2.005 
+    & 0.221 & 0.209 & 0.223 \\
+0.2 & 1.828 & 1.827 & 1.827 
+    & 2.807 & 2.816 & 2.815 
+    & 1.147 & 1.136 & 1.145 \\
+0.4 & 4.084 & 4.100 & 4.100 
+    & 4.952 & 4.961 & 4.962 
+    & 3.367 & 3.363 & 3.379 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %CAPÍTULO 5 - CONCLUSÕES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusões}
+O projeto forneceu uma base sólida nos fundamentos teóricos e computacionais da modelagem estocástica de preços de ativos financeiros, abordando a aplicação do Lema de Itô para a solução analítica da EDE (movimento browniano geométrico) e métodos numéricos de discretização, como Euler–Maruyama e Milstein, para a simulação de processos de difusão.
+
+
+Na precificação, utilizou-se o método de Monte Carlo para estimar o valor de opções europeias, validado pela fórmula de Black–Scholes. O uso de variáveis antitéticas foi eficaz na redução da variância, melhorando a precisão das estimativas. Para opções americanas, foi utilizado o método de Longstaff–Schwartz, que combina simulações de Monte Carlo com regressões por quadrados mínimos para estimar o exercício ótimo.
+
+O projeto também contribuiu para o desenvolvimento da intuição financeira e da autonomia computacional. Como continuidade, propõem-se expandir o estudo para opções exóticas e aprofundar o controle estocástico, com foco em alocação ótima de portfólio.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REFERÊNCIAS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Bibliografia}
+\printbibliography[heading=none]
+
+\noindent\textbf{Agradecimentos:}  
+ Guilherme agradece à bolsa PIBIC/UNICAMP, Luiz, pelo apoio durante o desenvolvimento deste projeto. Luiz agradece pelo apoio da FAPESP, processos  2023/01728-0 e 2023/02538-0.
+
+
+
+\end{document}
